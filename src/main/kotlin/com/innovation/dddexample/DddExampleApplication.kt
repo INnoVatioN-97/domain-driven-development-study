@@ -1,4 +1,4 @@
-package com.innovation.dddexample.domaindrivendevelopmentexample
+package com.innovation.dddexample
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

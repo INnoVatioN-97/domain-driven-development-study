@@ -1,4 +1,4 @@
-package com.innovation.dddexample.domaindrivendevelopmentexample.domain.member.model
+package com.innovation.dddexample.domain.member.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
