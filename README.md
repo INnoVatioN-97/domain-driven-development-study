@@ -26,8 +26,9 @@ Domain Driven Development 학습을 위한 Kotlin + Spring Boot 프로젝트
 
 ## 기술 스택
 
-- **Language**: Kotlin
-- **Framework**: Spring Boot
+- **Language**: Kotlin 1.9.25
+- **Framework**: Spring Boot 3.5.6
+- **Database**: MySQL
 - **Data Access**:
   - Spring Data JPA (ORM)
   - MyBatis (RowMapper)
@@ -68,9 +69,11 @@ Domain Driven Development 학습을 위한 Kotlin + Spring Boot 프로젝트
 - Payment (결제)
   - paymentMethod, paymentDate, amount
 
-**Member Aggregate**
+**Member Aggregate** ✅ 구현 완료
 - Member (회원 - Aggregate Root)
-  - id, name, email, phoneNumber
+  - id, name, registeredAt, withdrawnAt
+  - email: Email (Value Object) - 이메일 형식 검증
+  - phoneNumber: PhoneNumber (Value Object) - 전화번호 정규화, 마스킹
 
 ### 동시성 제어 전략
 
@@ -133,15 +136,32 @@ src/main/kotlin/com/innovation/dddexample/
 
 ## 학습 진행 사항
 
+### 완료
 - [x] 프로젝트 초기 설정
 - [x] DDD 도메인 소재 선정 (티켓 예매 시스템)
 - [x] 도메인 모델링 (Bounded Context, Aggregate 정의)
-- [x] 프로젝트 패키지 구조 생성
-- [ ] 도메인 모델 구현 (Entity, Value Object)
+- [x] 프로젝트 패키지 구조 생성 및 리팩토링 (`com.innovation.dddexample`)
+- [x] 데이터베이스 설정 (MySQL, JPA, MyBatis)
+- [x] Member Aggregate 구현
+  - [x] Member 엔티티 (Aggregate Root)
+  - [x] Email Value Object (검증, 포맷팅)
+  - [x] PhoneNumber Value Object (정규화, 마스킹, 통신사 구분)
+
+### 진행 중
 - [ ] Repository 인터페이스 정의
-- [ ] JPA 구현체 작성
-- [ ] MyBatis 구현체 작성
+- [ ] JPA Repository 구현
 - [ ] Application Service (Use Case) 구현
 - [ ] REST API Controller 구현
+
+### 예정
+- [ ] MyBatis 구현체 작성
+- [ ] Performance Aggregate 구현
+- [ ] Reservation Aggregate 구현
 - [ ] 동시성 제어 로직 구현 및 테스트
 - [ ] JPA vs MyBatis 사용 사례 정리
+
+## 학습 자료
+
+프로젝트 진행하면서 배운 내용들을 `til/` 디렉토리에 정리하고 있습니다:
+- `til/01-domain-model-directory-structure.md` - 도메인 모델 디렉토리 구조
+- `til/02-aggregate-and-value-object.md` - Aggregate와 Value Object 개념
