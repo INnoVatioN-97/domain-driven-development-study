@@ -148,3 +148,25 @@ This project uses Value Objects extensively for type safety and domain validatio
 - `PhoneNumber`: Phone number normalization ("01012345678" → "010-1234-5678"), masking, carrier detection
 
 Value Objects are embedded using `@Embeddable` and stored in the same table as their parent entity.
+
+## Functional Specifications
+
+Detailed functional specifications are available in:
+- [`docs/kbo-ticket-functional-spec.md`](./docs/kbo-ticket-functional-spec.md)
+
+## Testing Guidelines
+
+When writing tests:
+- Use Kotest framework for all tests
+- Follow BDD style (Given-When-Then)
+- Test domain logic independently of infrastructure
+- Use test fixtures for complex object creation
+- Mock external dependencies appropriately
+
+## Code Style Preferences
+
+- Prefer Kotlin idioms over Java patterns
+- Use data classes for DTOs and simple value holders
+- Leverage Kotlin's null safety features
+- Use extension functions where appropriate
+- Keep functions small and focused on single responsibility
