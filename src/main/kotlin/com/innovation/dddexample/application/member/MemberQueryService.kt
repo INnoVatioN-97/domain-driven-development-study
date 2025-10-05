@@ -44,6 +44,6 @@ class MemberQueryService(
      */
     fun getMemberById(id: Long): Member {
         return memberRepository.findById(id)
-            ?: throw MemberNotFoundException(id)
+            ?: throw MemberNotFoundException.byId(id)
     }
 }

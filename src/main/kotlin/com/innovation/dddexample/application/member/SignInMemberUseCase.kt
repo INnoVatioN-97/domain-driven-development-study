@@ -1,6 +1,7 @@
 package com.innovation.dddexample.application.member
 
 import com.innovation.dddexample.application.common.UseCase
+import com.innovation.dddexample.domain.member.exception.InvalidPasswordException
 import com.innovation.dddexample.domain.member.exception.MemberNotFoundException
 import com.innovation.dddexample.domain.member.model.Email
 import com.innovation.dddexample.infrastructure.security.jwt.JwtTokenProvider
@@ -21,10 +22,10 @@ class SignInMemberUseCase(
 
     override fun execute(command: SignInMemberCommand): TokenResponse {
         val member = memberRepository.findByEmail(Email(command.email))
-            ?: throw MemberNotFoundException(0) // ID를 모르므로 임시로 0 전달, 예외 메시지 개선 필요
+            ?: throw MemberNotFoundException.byEmail(command.email)
 
         if (!passwordEncoder.matches(command.password, member.password)) {
-            throw IllegalArgumentException("Invalid password")
+            throw InvalidPasswordException()
         }
 
         return TokenResponse(

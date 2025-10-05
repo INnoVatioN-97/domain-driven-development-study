@@ -19,6 +19,14 @@ import com.innovation.dddexample.domain.common.exception.NotFoundException
  * 1. MemberExceptionHandler (Member 도메인 특수 예외) - 현재는 없음
  * 2. GlobalExceptionHandler.handleNotFound() (NotFoundException 공통 처리) ← 여기서 처리
  */
-class MemberNotFoundException(
-    memberId: Long
-) : NotFoundException("Member not found with id: $memberId")
+class MemberNotFoundException private constructor(message: String) : NotFoundException(message) {
+    companion object {
+        fun byId(memberId: Long): MemberNotFoundException {
+            return MemberNotFoundException("Member not found with id: $memberId")
+        }
+
+        fun byEmail(email: String): MemberNotFoundException {
+            return MemberNotFoundException("Member not found with email: $email")
+        }
+    }
+}
