@@ -5,7 +5,7 @@
 | 날짜 | 상태 | 핵심 목표 | 세부 작업 | 산출물 & 검증 |
 | --- | --- | --- | --- | --- |
 | 10/04 (토) | 완료 | 학습 기반 준비 | 프로젝트 구조와 `CLAUDE.md` 재확인, `docs/kbo-ticket-functional-spec.md` 핵심 플로우 정리, 로컬 개발환경 점검(JDK 21, MySQL 연결) | 회고 노트, 환경 체크리스트 |
-| 10/05 (일) | 진행 예정 | 멤버 도메인 리포지토리 설계 | Member/Email/PhoneNumber 모델과 일치하는 리포지토리 인터페이스 명세, 저장소 접근 패턴 결정(JPA vs MyBatis), 테스트 전략 수립 | `domain/member/repository` 인터페이스 초안, 리포지토리 테스트 시나리오 |
+| 10/05 (일) | 완료 | 멤버 도메인 리포지토리 설계 | Member/Email/PhoneNumber 모델과 일치하는 리포지토리 인터페이스 명세, 저장소 접근 패턴 결정(JPA vs MyBatis), 테스트 전략 수립 | `domain/member/repository` 인터페이스 초안, 리포지토리 테스트 시나리오 |
 | 10/06 (월) | 진행 예정 | 멤버 리포지토리 구현 & 단위 테스트 | Spring Data JPA 구현체 작성, 데이터 매핑 검증, Kotest 기반 리포지토리 단위 테스트 작성 | `infrastructure/persistence/member` 구현, `MemberRepositoryTest` |
 | 10/07 (화) | 진행 예정 | 공연 도메인 리포지토리 및 좌석 모델 정리 | Performance/Seat/SeatGrade 엔티티 모델링 보완, 낙관/비관 락 처리 설계 문서화, MyBatis 조회 쿼리 초안 | `domain/performance/repository` 인터페이스, 좌석 락 설계 초안 |
 | 10/08 (수) | 진행 예정 | 예매 도메인 리포지토리 & 동시성 로직 | Reservation/ReservationItem/Payment 리포지토리 인터페이스 및 구현 계획, 좌석 잠금/대기열 정책 초안 문서화 | `domain/reservation/repository` 명세, 잠금 정책 노트 |
