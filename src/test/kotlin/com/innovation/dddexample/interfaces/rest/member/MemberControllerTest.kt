@@ -5,11 +5,13 @@ import com.innovation.dddexample.domain.member.exception.MemberNotFoundException
 import com.innovation.dddexample.domain.member.model.Email
 import com.innovation.dddexample.domain.member.model.Member
 import com.innovation.dddexample.domain.member.model.PhoneNumber
+import com.innovation.dddexample.interfaces.rest.common.GlobalExceptionHandler
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 
@@ -18,11 +20,12 @@ import org.springframework.test.web.servlet.get
  *
  * HTTP 계층 테스트:
  * - 200 OK 응답 검증
- * - 404 Not Found 검증
+ * - 404 Not Found 검증 (GlobalExceptionHandler 통합)
  * - 400 Bad Request 검증
  * - JSON 응답 형식 검증
  */
 @WebMvcTest(MemberController::class)
+@Import(GlobalExceptionHandler::class) // 전역 예외 처리기 포함
 class MemberControllerTest {
 
     @Autowired
