@@ -168,3 +168,5 @@ gradle-app.setting
 /.gemini/
 /.specify/
 /specs/
+
+/blog
