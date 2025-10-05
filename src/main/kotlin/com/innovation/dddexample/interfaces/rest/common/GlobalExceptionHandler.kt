@@ -4,12 +4,14 @@ import com.innovation.dddexample.domain.common.exception.BusinessRuleViolationEx
 import com.innovation.dddexample.domain.common.exception.DuplicateException
 import com.innovation.dddexample.domain.common.exception.NotFoundException
 import com.innovation.dddexample.interfaces.dto.common.ErrorResponse
-import org.slf4j.LoggerFactory
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * 전역 공통 예외 처리기입니다.
@@ -44,8 +46,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
-
     /**
      * NotFoundException (공통) → HTTP 404 Not Found
      *
@@ -62,7 +62,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(NotFoundException::class)
     fun handleNotFound(ex: NotFoundException): ResponseEntity<ErrorResponse> {
-        logger.warn("Resource not found: {}", ex.message)
+        logger.warn { "Resource not found: ${ex.message}" }
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
@@ -87,7 +87,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(DuplicateException::class)
     fun handleDuplicate(ex: DuplicateException): ResponseEntity<ErrorResponse> {
-        logger.warn("Duplicate resource: {}", ex.message)
+        logger.warn { "Duplicate resource: ${ex.message}" }
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
             .body(
@@ -113,7 +113,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessRuleViolationException::class)
     fun handleBusinessRuleViolation(ex: BusinessRuleViolationException): ResponseEntity<ErrorResponse> {
-        logger.warn("Business rule violation: {}", ex.message)
+        logger.warn { "Business rule violation: ${ex.message}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
@@ -137,7 +137,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleTypeMismatch(ex: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
-        logger.warn("Type mismatch for parameter '{}': {}", ex.name, ex.value)
+        logger.warn { "Type mismatch for parameter '${ex.name}': ${ex.value}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
@@ -161,7 +161,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception::class)
     fun handleGenericException(ex: Exception): ResponseEntity<ErrorResponse> {
-        logger.error("Unexpected error occurred", ex)
+        logger.error(ex) { "Unexpected error occurred" }
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(

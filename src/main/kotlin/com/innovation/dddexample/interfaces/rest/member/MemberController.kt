@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*
  * ❌ 도메인 엔티티 직접 반환
  */
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/members")
 class MemberController(
     private val memberQueryService: MemberQueryService
 ) {

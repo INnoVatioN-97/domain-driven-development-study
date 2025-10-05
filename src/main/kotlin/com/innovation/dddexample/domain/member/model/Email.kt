@@ -38,9 +38,10 @@ data class Email(
      * [실제 저장되는 값]
      * - members 테이블의 email 컬럼에 저장됨
      * - @Embeddable 덕분에 별도 테이블 생성 없이 Member 테이블에 포함됨
+     * - public 접근: infrastructure 계층(Spring Security)에서 접근 필요
      */
     @Column(name = "email", nullable = false, unique = true, length = 100)
-    private val value: String
+    val value: String
 ) {
     /**
      * [init 블록: Value Object의 핵심]
@@ -80,8 +81,11 @@ data class Email(
      * val newEmail = Email("new@example.com")
      * member.changeEmail(newEmail)
      * ```
+     *
+     * [value 접근]
+     * - value가 public이므로 자동 getter 생성됨
+     * - email.value로 직접 접근 가능
      */
-    fun getValue(): String = value
 
     /**
      * [동일성 비교]

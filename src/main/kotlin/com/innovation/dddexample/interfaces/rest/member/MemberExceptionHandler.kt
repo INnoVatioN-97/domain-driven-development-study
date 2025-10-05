@@ -1,11 +1,14 @@
 package com.innovation.dddexample.interfaces.rest.member
 
+import com.innovation.dddexample.domain.member.exception.DuplicateEmailException
 import com.innovation.dddexample.interfaces.dto.common.ErrorResponse
-import org.slf4j.LoggerFactory
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Member 도메인 전용 예외 처리기입니다.
@@ -41,14 +44,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @RestControllerAdvice(basePackages = ["com.innovation.dddexample.interfaces.rest.member"])
 class MemberExceptionHandler {
 
-    private val logger = LoggerFactory.getLogger(MemberExceptionHandler::class.java)
+    @ExceptionHandler(DuplicateEmailException::class)
+    fun handleDuplicateEmail(ex: DuplicateEmailException): ResponseEntity<ErrorResponse> {
+        logger.warn { "Duplicate email registration attempt: ${ex.message}" }
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT) // 409 Conflict
+            .body(
+                ErrorResponse(
+                    message = ex.message ?: "Email already exists",
+                    status = HttpStatus.CONFLICT.value()
+                )
+            )
+    }
 
     /**
      * 향후 Member 도메인 특수 예외 처리 예시:
      *
      * @ExceptionHandler(MemberWithdrawalBlockedException::class)
      * fun handleWithdrawalBlocked(ex: MemberWithdrawalBlockedException): ResponseEntity<ErrorResponse> {
-     *     logger.warn("Member withdrawal blocked: {}", ex.message)
+     *     logger.warn { "Member withdrawal blocked: ${ex.message}" }
      *     return ResponseEntity
      *         .status(HttpStatus.LOCKED) // 423 Locked
      *         .body(
@@ -61,7 +75,7 @@ class MemberExceptionHandler {
      *
      * @ExceptionHandler(MemberSuspendedException::class)
      * fun handleSuspended(ex: MemberSuspendedException): ResponseEntity<ErrorResponse> {
-     *     logger.warn("Suspended member tried to access: {}", ex.message)
+     *     logger.warn { "Suspended member tried to access: ${ex.message}" }
      *     return ResponseEntity
      *         .status(HttpStatus.FORBIDDEN) // 403 Forbidden
      *         .body(

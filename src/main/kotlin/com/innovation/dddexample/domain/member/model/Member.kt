@@ -77,6 +77,9 @@ class Member(
     @Column(nullable = false, length = 50)
     var name: String,
 
+    @Column(nullable = false, length = 128)
+    var password: String,
+
     /**
      * [Value Object 적용]
      *
@@ -90,6 +93,10 @@ class Member(
      */
     @Embedded
     var phoneNumber: PhoneNumber,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    val role: Role = Role.USER,
 
     /**
      * [DDD: 도메인 이벤트 추적]

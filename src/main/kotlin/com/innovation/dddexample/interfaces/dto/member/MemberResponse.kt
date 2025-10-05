@@ -48,7 +48,7 @@ data class MemberResponse(
 fun Member.toResponse(): MemberResponse = MemberResponse(
     id = this.id!!,
     name = this.name,
-    email = this.email.getValue(),
+    email = this.email.value,  // Email Value Object의 value 직접 접근
     phoneNumber = this.phoneNumber.toMasked(),  // [중요] Privacy! 전체 번호가 아닌 마스킹된 형식
     status = if (this.isWithdrawn()) "WITHDRAWN" else "ACTIVE",
     pointBalance = 0,  // TODO: Points Aggregate 연동 필요
