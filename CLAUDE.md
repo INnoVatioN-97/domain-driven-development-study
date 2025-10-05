@@ -112,12 +112,28 @@ com.innovation.dddexample/
 **Naming Convention:**
 - `domain/{context}/model/` - Aggregate Root, Entities, Value Objects
 - `domain/{context}/repository/` - Repository interfaces (domain layer)
-- `domain/{context}/service/` - Domain services
-- `application/{context}/` - Application services (use cases)
+- `domain/{context}/service/` - Domain services (여러 Aggregate 걸친 도메인 로직)
+- `application/{context}/` - Use cases (단일 Aggregate 사용)
 - `infrastructure/persistence/{context}/` - JPA repository implementations
 - `infrastructure/mybatis/{context}/` - MyBatis mapper implementations
 - `interfaces/rest/{context}/` - REST API controllers
 - `interfaces/dto/{context}/` - Request/Response DTOs
+
+**Service Naming Strategy:**
+- **UseCase** (`~UseCase.kt`): 단일 Aggregate를 다루는 Application 계층 서비스
+  - 예: `JoinMemberUseCase`, `UpdateMemberUseCase`, `CreateReservationUseCase`
+  - 위치: `application/{context}/`
+  - 역할: 유스케이스 조율, 트랜잭션 관리, 인프라 서비스 호출
+
+- **Domain Service** (`~DomainService.kt`): 여러 Aggregate를 걸치는 도메인 로직
+  - 예: `MemberDomainService`, `ReservationDomainService`
+  - 위치: `domain/{context}/service/`
+  - 역할: 단일 Aggregate로 해결할 수 없는 도메인 규칙 처리
+
+- **Query Service** (`~QueryService.kt`): 조회 전용 서비스 (CQRS의 Query)
+  - 예: `MemberQueryService` (기존 유지)
+  - 위치: `application/{context}/`
+  - 역할: 읽기 전용 조회, 복잡한 조회는 MyBatis 활용 가능
 
 ## Development Notes
 
@@ -170,3 +186,9 @@ When writing tests:
 - Leverage Kotlin's null safety features
 - Use extension functions where appropriate
 - Keep functions small and focused on single responsibility
+
+## Agent Workflow Addendum (2025-10-05)
+
+- 도메인 작업 착수 전, 해당 도메인 경로(예: `src/main/kotlin/com/innovation/dddexample/domain/member/`)에 요구 정리용 Markdown을 생성해 지침서를 유지한다.
+- 요구 정리는 Aggregate 구조, 필수 Repository 기능, 기능 명세 연계 포인트, 테스트 체크리스트, 열린 이슈를 최소 항목으로 포함한다.
+- 새 지침서는 `docs`와 소스 경로 모두에서 참조 가능하도록 파일명을 명확히 하고, 이후 구현 단계는 해당 지침을 근거로 진행한다.
