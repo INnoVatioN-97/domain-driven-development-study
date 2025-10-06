@@ -25,7 +25,8 @@ class MemberResponseTest : FunSpec({
             name = "홍길동",
             phoneNumber = PhoneNumber("01012345678"),
             registeredAt = LocalDateTime.of(2025, 1, 15, 10, 30),
-            withdrawnAt = null
+            withdrawnAt = null,
+            password = "hashedPassword123"
         )
 
         // When
@@ -50,7 +51,8 @@ class MemberResponseTest : FunSpec({
             name = "탈퇴회원",
             phoneNumber = PhoneNumber("01098765432"),
             registeredAt = LocalDateTime.of(2024, 1, 1, 10, 0),
-            withdrawnAt = withdrawnTime
+            withdrawnAt = withdrawnTime,
+            password = "hashedPassword123"
         )
 
         // When
@@ -77,7 +79,8 @@ class MemberResponseTest : FunSpec({
                 id = 1L,
                 email = Email("test@example.com"),
                 name = "Test",
-                phoneNumber = PhoneNumber(phone)
+                phoneNumber = PhoneNumber(phone),
+                password = "hashedPassword123"
             )
 
             // When
@@ -95,7 +98,8 @@ class MemberResponseTest : FunSpec({
             id = 1L,
             email = Email(testEmail),
             name = "User",
-            phoneNumber = PhoneNumber("01011112222")
+            phoneNumber = PhoneNumber("01011112222"),
+            password = "hashedPassword123"
         )
 
         // When

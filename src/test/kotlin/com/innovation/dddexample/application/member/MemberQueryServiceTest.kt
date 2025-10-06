@@ -31,7 +31,8 @@ class MemberQueryServiceTest : FunSpec({
             id = 1L,
             email = Email("test@example.com"),
             name = "Test User",
-            phoneNumber = PhoneNumber("01012345678")
+            phoneNumber = PhoneNumber("01012345678"),
+            password = "hashedPassword123"
         )
 
         every { repository.findById(1L) } returns expectedMember
@@ -69,7 +70,8 @@ class MemberQueryServiceTest : FunSpec({
             id = 42L,
             email = Email("user@test.com"),
             name = "User",
-            phoneNumber = PhoneNumber("01099998888")
+            phoneNumber = PhoneNumber("01099998888"),
+            password = "hashedPassword123"
         )
 
         every { repository.findById(42L) } returns member

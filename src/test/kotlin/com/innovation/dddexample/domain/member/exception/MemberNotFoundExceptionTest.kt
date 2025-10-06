@@ -17,7 +17,7 @@ class MemberNotFoundExceptionTest : FunSpec({
         val memberId = 999L
 
         // When
-        val exception = MemberNotFoundException(memberId)
+        val exception = MemberNotFoundException.byId(memberId)
 
         // Then
         exception.message shouldContain "999"
@@ -26,7 +26,7 @@ class MemberNotFoundExceptionTest : FunSpec({
 
     test("exception should be RuntimeException subclass") {
         // Given
-        val exception = MemberNotFoundException(123L)
+        val exception = MemberNotFoundException.byId(123L)
 
         // Then
         exception.shouldBeInstanceOf<RuntimeException>()
@@ -34,8 +34,8 @@ class MemberNotFoundExceptionTest : FunSpec({
 
     test("different member IDs should produce different messages") {
         // Given
-        val exception1 = MemberNotFoundException(1L)
-        val exception2 = MemberNotFoundException(2L)
+        val exception1 = MemberNotFoundException.byId(1L)
+        val exception2 = MemberNotFoundException.byId(2L)
 
         // Then
         exception1.message shouldContain "1"
