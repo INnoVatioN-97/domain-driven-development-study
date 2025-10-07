@@ -32,15 +32,17 @@ import jakarta.persistence.Embeddable
  * - PhoneNumber 객체가 존재한다 = 유효한 전화번호다 (보장됨)
  */
 @Embeddable
-data class PhoneNumber(
+class PhoneNumber(
+    inputValue: String
+) {
     /**
      * [정규화된 형식으로 저장]
      * - "01012345678" 입력 → "010-1234-5678" 변환 후 저장
      * - DB에는 일관된 형식으로 저장되어 검색/비교 용이
      */
     @Column(name = "phone_number", nullable = false, length = 20)
-    private val value: String
-) {
+    private val value: String = normalizePhoneNumber(inputValue)
+
     /**
      * [생성자에서 정규화 + 검증]
      *
@@ -53,10 +55,9 @@ data class PhoneNumber(
      * → 외부에서는 이 모든 복잡함을 신경 쓸 필요 없음!
      */
     init {
-        val normalized = normalizePhoneNumber(value)
-        require(normalized.isNotBlank()) { "전화번호는 필수입니다" }
-        require(normalized.matches(PHONE_REGEX)) {
-            "올바른 전화번호 형식이 아닙니다: $value (형식: 010-1234-5678)"
+        require(value.isNotBlank()) { "전화번호는 필수입니다" }
+        require(value.matches(PHONE_REGEX)) {
+            "올바른 전화번호 형식이 아닙니다: $inputValue (형식: 010-1234-5678)"
         }
     }
 
@@ -114,6 +115,19 @@ data class PhoneNumber(
     }
 
     override fun toString(): String = value
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PhoneNumber
+
+        return value == other.value
+    }
+
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
 
     companion object {
         /**

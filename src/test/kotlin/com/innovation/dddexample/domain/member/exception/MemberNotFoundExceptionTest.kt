@@ -1,45 +1,52 @@
 package com.innovation.dddexample.domain.member.exception
 
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.types.shouldBeInstanceOf
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 
 /**
  * T004: Unit test for MemberNotFoundException
  *
  * 도메인 예외가 올바르게 동작하는지 검증합니다.
  */
-class MemberNotFoundExceptionTest : FunSpec({
+@DisplayName("MemberNotFoundException 단위 테스트")
+class MemberNotFoundExceptionTest {
 
-    test("exception message should contain member ID") {
+    @Test
+    @DisplayName("예외 메시지에 회원 ID가 포함되어야 한다")
+    fun `exception message should contain member ID`() {
         // Given
         val memberId = 999L
 
         // When
-        val exception = MemberNotFoundException(memberId)
+        val exception = MemberNotFoundException.byId(memberId)
 
         // Then
-        exception.message shouldContain "999"
-        exception.message shouldContain "Member not found"
+        assertTrue(exception.message!!.contains("999"))
+        assertTrue(exception.message!!.contains("Member not found"))
     }
 
-    test("exception should be RuntimeException subclass") {
+    @Test
+    @DisplayName("RuntimeException의 하위 클래스여야 한다")
+    fun `exception should be RuntimeException subclass`() {
         // Given
-        val exception = MemberNotFoundException(123L)
+        val exception = MemberNotFoundException.byId(123L)
 
         // Then
-        exception.shouldBeInstanceOf<RuntimeException>()
+        assertTrue(exception is RuntimeException)
     }
 
-    test("different member IDs should produce different messages") {
+    @Test
+    @DisplayName("다른 회원 ID는 다른 예외 메시지를 생성해야 한다")
+    fun `different member IDs should produce different messages`() {
         // Given
-        val exception1 = MemberNotFoundException(1L)
-        val exception2 = MemberNotFoundException(2L)
+        val exception1 = MemberNotFoundException.byId(1L)
+        val exception2 = MemberNotFoundException.byId(2L)
 
         // Then
-        exception1.message shouldContain "1"
-        exception2.message shouldContain "2"
-        (exception1.message == exception2.message) shouldBe false
+        assertTrue(exception1.message!!.contains("1"))
+        assertTrue(exception2.message!!.contains("2"))
+        assertNotEquals(exception1.message, exception2.message)
     }
-})
+}
