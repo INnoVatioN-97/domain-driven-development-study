@@ -28,19 +28,6 @@ class Team(
     @CreatedDate
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
-    @OneToMany(mappedBy = "homeTeam")
-    val homeGames: MutableList<Game> = mutableListOf(),
-
-    @OneToMany(mappedBy = "awayTeam")
-    val awayGames: MutableList<Game> = mutableListOf(),
-
-    @OneToMany(mappedBy = "winner")
-    val winningGames: MutableList<Game> = mutableListOf(),
-
-    @OneToMany(mappedBy = "loser")
-    val losingGames: MutableList<Game> = mutableListOf(),
-
-    ) {
-
-
+) {
+    // Team과 관련된 비즈니스 로직을 여기에 추가할 수 있습니다.
 }

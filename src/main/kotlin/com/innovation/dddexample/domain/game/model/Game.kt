@@ -18,10 +18,6 @@ class Game(
     @Column(nullable = false, length = 20)
     val gameType: GameType = GameType.REGULAR_SEASON,
 
-    // "2025-09-02 두산 vs KT
-    @Column(nullable = false, length = 40)
-    val title: String,
-
     // 홈팀
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "home_team_id", referencedColumnName = "id")
@@ -43,5 +39,8 @@ class Game(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true, name = "loser_id", referencedColumnName = "id")
     val loser: Team? = null,
-
-    ) {}
+) {
+    init {
+        require(homeTeam.id != awayTeam.id) { "Home team and away team cannot be the same." }
+    }
+}
