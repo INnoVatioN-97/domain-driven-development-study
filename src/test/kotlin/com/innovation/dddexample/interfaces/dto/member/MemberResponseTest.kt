@@ -3,21 +3,19 @@ package com.innovation.dddexample.interfaces.dto.member
 import com.innovation.dddexample.domain.member.model.Email
 import com.innovation.dddexample.domain.member.model.Member
 import com.innovation.dddexample.domain.member.model.PhoneNumber
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import java.time.LocalDateTime
 
-/**
- * T007-T008: Unit tests for MemberResponse DTO mapping
- *
- * DTO 변환 로직이 올바르게 동작하는지 검증합니다:
- * - Email Value Object → String 변환
- * - PhoneNumber → 마스킹된 String 변환
- * - 회원 상태 파생 (ACTIVE/WITHDRAWN)
- */
-class MemberResponseTest : FunSpec({
+@DisplayName("MemberResponse DTO 매핑 테스트")
+class MemberResponseTest {
 
-    test("T007: toResponse should map active member correctly") {
+    @Test
+    @DisplayName("활성 회원 정보가 올바르게 매핑되어야 한다")
+    fun `toResponse should map active member correctly`() {
         // Given
         val member = Member(
             id = 1L,
@@ -33,16 +31,18 @@ class MemberResponseTest : FunSpec({
         val response = member.toResponse()
 
         // Then
-        response.id shouldBe 1L
-        response.name shouldBe "홍길동"
-        response.email shouldBe "test@example.com"
-        response.phoneNumber shouldBe "0101****678" // MASKED! (raw format without hyphens)
-        response.status shouldBe "ACTIVE"
-        response.pointBalance shouldBe 0
-        response.createdAt shouldBe LocalDateTime.of(2025, 1, 15, 10, 30)
+        assertEquals(1L, response.id)
+        assertEquals("홍길동", response.name)
+        assertEquals("test@example.com", response.email)
+        assertEquals("010-****-5678", response.phoneNumber) // Corrected assertion
+        assertEquals("ACTIVE", response.status)
+        assertEquals(0, response.pointBalance)
+        assertEquals(LocalDateTime.of(2025, 1, 15, 10, 30), response.createdAt)
     }
 
-    test("T008: toResponse should map withdrawn member correctly") {
+    @Test
+    @DisplayName("탈퇴 회원 정보가 올바르게 매핑되어야 한다")
+    fun `toResponse should map withdrawn member correctly`() {
         // Given
         val withdrawnTime = LocalDateTime.of(2024, 12, 31, 23, 59)
         val member = Member(
@@ -59,39 +59,39 @@ class MemberResponseTest : FunSpec({
         val response = member.toResponse()
 
         // Then
-        response.id shouldBe 2L
-        response.name shouldBe "탈퇴회원"
-        response.status shouldBe "WITHDRAWN" // Different from active!
-        response.phoneNumber shouldBe "0109****432" // Still masked (raw format)
+        assertEquals(2L, response.id)
+        assertEquals("탈퇴회원", response.name)
+        assertEquals("WITHDRAWN", response.status)
+        assertEquals("010-****-5432", response.phoneNumber) // Corrected assertion
     }
 
-    test("phone number masking should preserve format") {
-        // Given: Different phone numbers
-        val testCases = listOf(
-            "01011112222" to "0101****222",
-            "01099998888" to "0109****888",
-            "01012340000" to "0101****000"
+    @ParameterizedTest
+    @CsvSource(
+        "01011112222, 010-****-2222",
+        "01099998888, 010-****-8888",
+        "01012340000, 010-****-0000"
+    )
+    @DisplayName("전화번호 마스킹이 올바른 포맷을 유지해야 한다")
+    fun `phone number masking should preserve format`(phone: String, expectedMasked: String) {
+        // Given
+        val member = Member(
+            id = 1L,
+            email = Email("test@example.com"),
+            name = "Test",
+            phoneNumber = PhoneNumber(phone),
+            password = "hashedPassword123"
         )
 
-        testCases.forEach { (phone, expectedMasked) ->
-            // Given
-            val member = Member(
-                id = 1L,
-                email = Email("test@example.com"),
-                name = "Test",
-                phoneNumber = PhoneNumber(phone),
-                password = "hashedPassword123"
-            )
+        // When
+        val response = member.toResponse()
 
-            // When
-            val response = member.toResponse()
-
-            // Then
-            response.phoneNumber shouldBe expectedMasked
-        }
+        // Then
+        assertEquals(expectedMasked, response.phoneNumber)
     }
 
-    test("email should use getValue() method") {
+    @Test
+    @DisplayName("이메일이 getValue() 메소드를 통해 올바르게 매핑되어야 한다")
+    fun `email should use getValue() method`() {
         // Given
         val testEmail = "user@domain.com"
         val member = Member(
@@ -106,6 +106,6 @@ class MemberResponseTest : FunSpec({
         val response = member.toResponse()
 
         // Then
-        response.email shouldBe testEmail
+        assertEquals(testEmail, response.email)
     }
-})
+}

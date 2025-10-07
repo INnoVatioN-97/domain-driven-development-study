@@ -48,9 +48,7 @@ dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Kotest (T001)
-    testImplementation 'io.kotest:kotest-runner-junit5:5.8.0'
-    testImplementation 'io.kotest:kotest-assertions-core:5.8.0'
+    // Kotest dependencies removed
     testImplementation 'io.mockk:mockk:1.13.8'
     testImplementation 'com.ninja-squad:springmockk:4.0.2'
 
