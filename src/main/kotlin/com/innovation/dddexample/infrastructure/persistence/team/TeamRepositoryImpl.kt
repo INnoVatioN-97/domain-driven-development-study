@@ -17,4 +17,8 @@ class TeamRepositoryImpl(private val teamJpaRepository: TeamJpaRepository) : Tea
     override fun findById(id: Long): Team? {
         return teamJpaRepository.findById(id).orElse(null)
     }
+
+    override fun findAll(): List<Team> {
+        return teamJpaRepository.findAll()
+    }
 }

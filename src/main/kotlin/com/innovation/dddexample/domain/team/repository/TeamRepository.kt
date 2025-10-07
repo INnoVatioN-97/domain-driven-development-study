@@ -15,4 +15,6 @@ interface TeamRepository {
      */
     fun findById(id: Long): Team?
 
+    fun findAll(): List<Team>
+
 }
