@@ -2,7 +2,7 @@ package com.innovation.dddexample.domain.game.model
 
 import com.innovation.dddexample.domain.team.model.Team
 import jakarta.persistence.*
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 /**
  * 경기 엔티티
@@ -23,20 +23,25 @@ class Game(
     val title: String,
 
     // 홈팀
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "home_team_id", referencedColumnName = "id")
     val homeTeam: Team,
 
     // 어웨이팀
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "away_team_id", referencedColumnName = "id")
     val awayTeam: Team,
 
-    // 경기일자
+    // 경기 진행일시
     @Column(nullable = false)
-    val gameDate: LocalDate,
+    val gameTime: LocalDateTime,
 
-    // 전적
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true, name = "winner_id", referencedColumnName = "id")
+    val winner: Team? = null,
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true, name = "loser_id", referencedColumnName = "id")
+    val loser: Team? = null,
 
-)
+    ) {}

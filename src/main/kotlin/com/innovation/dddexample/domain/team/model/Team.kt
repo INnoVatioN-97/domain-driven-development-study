@@ -21,6 +21,10 @@ class Team(
     @Column(nullable = false, length = 256)
     val logoUrl: String,
 
+    // 경기장명
+    @Column(nullable = false, length = 45)
+    val stadium: String,
+
     @CreatedDate
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
@@ -30,8 +34,13 @@ class Team(
     @OneToMany(mappedBy = "awayTeam")
     val awayGames: MutableList<Game> = mutableListOf(),
 
-    ) {
+    @OneToMany(mappedBy = "winner")
+    val winningGames: MutableList<Game> = mutableListOf(),
 
+    @OneToMany(mappedBy = "loser")
+    val losingGames: MutableList<Game> = mutableListOf(),
+
+    ) {
 
 
 }
