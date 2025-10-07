@@ -36,56 +36,46 @@ DDD(Domain Driven Development) 방법론 학습을 위한 Kotlin + Spring Boot �
 
 -   **Member Aggregate**: ✅ **구현 완료 (JWT 인증 포함)**
     -   `Member` (Root), `Email` (VO), `PhoneNumber` (VO)
--   **Performance Aggregate**: 🚧 **구현 예정**
-    -   `Performance` (Root), `Seat`, `SeatGrade`
+-   **Performance Aggregate**: 🚧 **구현 중**
+    -   `Team` (Entity), `Game` (Entity) - 도메인 모델링 및 시더 구현 완료
 -   **Reservation Aggregate**: 🚧 **구현 예정**
     -   `Reservation` (Root), `ReservationItem`, `Payment`
 
 ## 프로젝트 구조 (현재)
 
-`member` 도메인과 인증/인가 기능 구현이 완료된 현재 프로젝트 구조입니다.
+`member`, `team`, `game` 도메인 모델과 시더가 구현된 현재 프로젝트 구조입니다.
 
 ```
 src/main/kotlin/com/innovation/dddexample/
 ├── DddExampleApplication.kt
 ├── application
 │   └── member/
-│       ├── MemberQueryService.kt
-│       ├── SignInMemberUseCase.kt
-│       └── SignUpMemberUseCase.kt
 ├── domain
-│   └── member/
+│   ├── game/
+│   │   ├── model/
+│   │   │   ├── Game.kt
+│   │   │   └── GameType.kt
+│   │   └── repository/
+│   │       └── GameRepository.kt
+│   ├── member/
+│   │   └── ... (생략)
+│   └── team/
 │       ├── model/
-│       │   ├── Member.kt           # Aggregate Root
-│       │   ├── Email.kt            # Value Object
-│       │   └── PhoneNumber.kt      # Value Object
-│       ├── repository/
-│       │   └── MemberRepository.kt # Interface
-│       └── service/
-│           └── MemberDomainService.kt
+│       │   └── Team.kt
+│       └── repository/
+│           └── TeamRepository.kt
 ├── infrastructure
 │   ├── persistence/
-│   │   └── member/
-│   │       └── MemberRepositoryImpl.kt # JPA Implementation
+│   │   ├── member/
+│   │   └── team/
+│   ├── seed/
+│   │   ├── DataSeeder.kt
+│   │   ├── game/GameSeeder.kt
+│   │   └── team/TeamSeeder.kt
 │   └── security/
-│       ├── auth/
-│       │   └── MemberDetailsService.kt
-│       ├── filter/
-│       │   └── JwtAuthenticationFilter.kt
-│       └── jwt/
-│           ├── JwtProperties.kt
-│           └── JwtTokenProvider.kt
+│       └── ... (생략)
 └── interfaces
-    ├── dto/
-    │   ├── auth/
-    │   │   └── TokenResponse.kt
-    │   └── member/
-    │       └── MemberResponse.kt
-    └── rest/
-        ├── auth/
-        │   └── AuthController.kt     # 회원가입, 로그인
-        └── member/
-            └── MemberController.kt   # 회원 정보 조회
+    └── ... (생략)
 ```
 
 ## 구현 현황
@@ -97,6 +87,10 @@ src/main/kotlin/com/innovation/dddexample/
 - **Interface Layer**: 회원가입, 로그인, 정보 조회를 위한 REST API (`AuthController`, `MemberController`) 구현
 - **Security**: Spring Security와 JWT를 연동한 인증/인가 시스템 구축
 - **Testing**: 주요 로직에 대한 단위/통합 테스트 작성
+
+### 🚧 `v1.5` - 공연 도메인 기반 마련 (진행 중)
+- **Domain Layer**: `Team`, `Game` 엔티티 모델링 (DDD 원칙 기반 리팩토링 완료)
+- **Infrastructure Layer**: `local`/`dev` 프로파일용 데이터 시더 구현 (KBO 10개 구단 및 720경기 전체 일정 자동 생성)
 
 ### 🚧 `v2.0` - 공연 및 예매 도메인 (예정)
 - `Performance` Aggregate 구현 (공연, 좌석, 등급 관리)
@@ -112,8 +106,11 @@ src/main/kotlin/com/innovation/dddexample/
 ```
 
 ### 실행
+
+`local` 또는 `dev` 프로파일로 실행 시, 애플리케이션이 시작되면서 KBO 10개 구단 및 정규시즌 720경기 데이터가 자동으로 DB에 생성됩니다.
+
 ```bash
-./gradlew bootRun
+./gradlew bootRun --args='--spring.profiles.active=local'
 ```
 
 ## 학습 자료

@@ -6,8 +6,8 @@
 | --- | --- | --- | --- | --- |
 | 10/04 (토) | 완료 | 학습 기반 준비 | 프로젝트 구조와 `CLAUDE.md` 재확인, `docs/kbo-ticket-functional-spec.md` 핵심 플로우 정리, 로컬 개발환경 점검(JDK 21, MySQL 연결) | 회고 노트, 환경 체크리스트 |
 | 10/05 (일) | 완료 | 멤버 도메인 리포지토리 설계 | Member/Email/PhoneNumber 모델과 일치하는 리포지토리 인터페이스 명세, 저장소 접근 패턴 결정(JPA vs MyBatis), 테스트 전략 수립 | `domain/member/repository` 인터페이스 초안, 리포지토리 테스트 시나리오 |
-| 10/06 (월) | 진행 예정 | 멤버 리포지토리 구현 & 단위 테스트 | Spring Data JPA 구현체 작성, 데이터 매핑 검증, Kotest 기반 리포지토리 단위 테스트 작성 | `infrastructure/persistence/member` 구현, `MemberRepositoryTest` |
-| 10/07 (화) | 진행 예정 | 공연 도메인 리포지토리 및 좌석 모델 정리 | Performance/Seat/SeatGrade 엔티티 모델링 보완, 낙관/비관 락 처리 설계 문서화, MyBatis 조회 쿼리 초안 | `domain/performance/repository` 인터페이스, 좌석 락 설계 초안 |
+| 10/06 (월) | 완료 | 멤버 리포지토리 구현 & 단위 테스트 | Spring Data JPA 기반 리포지토리 구현 및 데이터 매핑 검증 완료. 통합 테스트를 통해 기능 검증. | `infrastructure/persistence/member` 구현체, `MemberIntegrationTest` |
+| 10/07 (화) | 진행 중 | 공연 도메인 모델링 및 기반 구현 | `Team`, `Game` 엔티티 DDD 원칙에 맞게 리팩토링, `local`/`dev` 환경용 데이터 시더(팀, 경기일정) 구현 | `domain/team`, `domain/game` 모델, `infrastructure/seed` 구현체 |
 | 10/08 (수) | 진행 예정 | 예매 도메인 리포지토리 & 동시성 로직 | Reservation/ReservationItem/Payment 리포지토리 인터페이스 및 구현 계획, 좌석 잠금/대기열 정책 초안 문서화 | `domain/reservation/repository` 명세, 잠금 정책 노트 |
 | 10/09 (목) | 진행 예정 | 애플리케이션 서비스 유스케이스 1차 | 회원 가입, 경기 좌석 조회, 예매 생성 플로우별 Application Service 작성, 도메인 이벤트 초안 마련 | `application/member`, `application/performance`, `application/reservation` 기본 유스케이스 |
 | 10/10 (금) | 진행 예정 | REST API 1차 공개 범위 구성 | 회원 가입/로그인, 경기 조회, 예매 생성 REST 컨트롤러 및 DTO 작성, API 계약서 초안 | `interfaces/rest/*`, `interfaces/dto/*`, OpenAPI 초안 |
