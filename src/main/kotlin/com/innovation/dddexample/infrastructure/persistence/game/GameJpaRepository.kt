@@ -1,0 +1,7 @@
+package com.innovation.dddexample.infrastructure.persistence.game
+
+import com.innovation.dddexample.domain.game.model.Game
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface GameJpaRepository : JpaRepository<Game, Long> {
+}
