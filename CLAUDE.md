@@ -173,11 +173,11 @@ Detailed functional specifications are available in:
 ## Testing Guidelines
 
 When writing tests:
-- Use Kotest framework for all tests
-- Follow BDD style (Given-When-Then)
-- Test domain logic independently of infrastructure
-- Use test fixtures for complex object creation
-- Mock external dependencies appropriately
+- Use JUnit 5 framework for all tests.
+- Use `@DisplayName` to describe the test's purpose.
+- Test domain logic independently of infrastructure.
+- Use test fixtures for complex object creation.
+- Mock external dependencies appropriately.
 
 ## Code Style Preferences
 

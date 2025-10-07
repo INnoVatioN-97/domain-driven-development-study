@@ -5,13 +5,13 @@ import com.innovation.dddexample.domain.member.model.Email
 import com.innovation.dddexample.domain.member.model.Member
 import com.innovation.dddexample.domain.member.model.PhoneNumber
 import com.innovation.dddexample.domain.member.repository.MemberRepository
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 /**
  * T005-T006: Unit tests for MemberQueryService
@@ -20,13 +20,16 @@ import io.mockk.verify
  * - Repository 호출 및 결과 반환
  * - 예외 처리 (Member not found)
  */
-class MemberQueryServiceTest : FunSpec({
+@DisplayName("MemberQueryService 단위 테스트")
+class MemberQueryServiceTest {
 
-    test("T005: getMemberById should return member when exists") {
+    private val repository: MemberRepository = mockk()
+    private val service = MemberQueryService(repository)
+
+    @Test
+    @DisplayName("ID로 회원 조회 시 존재하는 경우 회원 정보를 반환해야 한다")
+    fun `getMemberById should return member when exists`() {
         // Given
-        val repository = mockk<MemberRepository>()
-        val service = MemberQueryService(repository)
-
         val expectedMember = Member(
             id = 1L,
             email = Email("test@example.com"),
@@ -41,31 +44,29 @@ class MemberQueryServiceTest : FunSpec({
         val result = service.getMemberById(1L)
 
         // Then
-        result shouldBe expectedMember
+        assertEquals(expectedMember, result)
         verify(exactly = 1) { repository.findById(1L) }
     }
 
-    test("T006: getMemberById should throw MemberNotFoundException when not exists") {
+    @Test
+    @DisplayName("ID로 회원 조회 시 존재하지 않는 경우 MemberNotFoundException을 던져야 한다")
+    fun `getMemberById should throw MemberNotFoundException when not exists`() {
         // Given
-        val repository = mockk<MemberRepository>()
-        val service = MemberQueryService(repository)
-
         every { repository.findById(999L) } returns null
 
         // When & Then
-        val exception = shouldThrow<MemberNotFoundException> {
+        val exception = assertThrows<MemberNotFoundException> {
             service.getMemberById(999L)
         }
 
-        exception.message shouldContain "999"
-        exception.message shouldContain "Member not found"
+        assertEquals("Member not found with id: 999", exception.message)
         verify(exactly = 1) { repository.findById(999L) }
     }
 
-    test("service should call repository with correct ID") {
+    @Test
+    @DisplayName("올바른 ID로 Repository를 호출해야 한다")
+    fun `service should call repository with correct ID`() {
         // Given
-        val repository = mockk<MemberRepository>()
-        val service = MemberQueryService(repository)
         val member = Member(
             id = 42L,
             email = Email("user@test.com"),
@@ -82,4 +83,4 @@ class MemberQueryServiceTest : FunSpec({
         // Then
         verify(exactly = 1) { repository.findById(42L) }
     }
-})
+}
