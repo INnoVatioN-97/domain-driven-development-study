@@ -112,12 +112,28 @@ com.innovation.dddexample/
 **Naming Convention:**
 - `domain/{context}/model/` - Aggregate Root, Entities, Value Objects
 - `domain/{context}/repository/` - Repository interfaces (domain layer)
-- `domain/{context}/service/` - Domain services
-- `application/{context}/` - Application services (use cases)
+- `domain/{context}/service/` - Domain services (여러 Aggregate 걸친 도메인 로직)
+- `application/{context}/` - Use cases (단일 Aggregate 사용)
 - `infrastructure/persistence/{context}/` - JPA repository implementations
 - `infrastructure/mybatis/{context}/` - MyBatis mapper implementations
 - `interfaces/rest/{context}/` - REST API controllers
 - `interfaces/dto/{context}/` - Request/Response DTOs
+
+**Service Naming Strategy:**
+- **UseCase** (`~UseCase.kt`): 단일 Aggregate를 다루는 Application 계층 서비스
+  - 예: `JoinMemberUseCase`, `UpdateMemberUseCase`, `CreateReservationUseCase`
+  - 위치: `application/{context}/`
+  - 역할: 유스케이스 조율, 트랜잭션 관리, 인프라 서비스 호출
+
+- **Domain Service** (`~DomainService.kt`): 여러 Aggregate를 걸치는 도메인 로직
+  - 예: `MemberDomainService`, `ReservationDomainService`
+  - 위치: `domain/{context}/service/`
+  - 역할: 단일 Aggregate로 해결할 수 없는 도메인 규칙 처리
+
+- **Query Service** (`~QueryService.kt`): 조회 전용 서비스 (CQRS의 Query)
+  - 예: `MemberQueryService` (기존 유지)
+  - 위치: `application/{context}/`
+  - 역할: 읽기 전용 조회, 복잡한 조회는 MyBatis 활용 가능
 
 ## Development Notes
 
@@ -135,208 +151,11 @@ com.innovation.dddexample/
   - Email Value Object (validation, formatting)
   - PhoneNumber Value Object (validation, normalization, masking)
 - Package structure refactored to `com.innovation.dddexample`
-- Member Repository layer
-  - MemberRepository interface (domain layer)
-  - MemberJpaRepository (Spring Data JPA)
-  - MemberRepositoryImpl (infrastructure layer)
 
 ### 🚧 In Progress
-- Member GET API (Reference Implementation)
-  - Application service (MemberQueryService)
-  - REST controller (MemberController)
-  - DTOs and exception handling
-
-## Reference Implementation: Member GET API
-
-**Feature**: GET /api/members/{id} - Retrieve member information by ID
-
-This implementation serves as a **reference pattern** for all future DDD-based APIs in the project.
-
-### Layer-by-Layer Implementation
-
-#### 1. Domain Layer (No changes needed)
-- **Member** aggregate already exists with Value Objects
-- **MemberRepository** interface defines contract: `fun findById(id: Long): Member?`
-- **MemberNotFoundException** domain exception created for not-found scenario
-
-```kotlin
-// domain/member/exception/MemberNotFoundException.kt
-class MemberNotFoundException(
-    memberId: Long
-) : RuntimeException("Member not found with id: $memberId")
-```
-
-**Key Principle**: Domain layer knows nothing about HTTP, REST, or Spring Web.
-
-#### 2. Infrastructure Layer (Existing)
-- **MemberRepositoryImpl** implements domain interface
-- Delegates to **MemberJpaRepository** (Spring Data JPA)
-- Converts JPA `Optional<Member>` to Kotlin nullable `Member?`
-
-**Key Principle**: Infrastructure knows about JPA but domain doesn't.
-
-#### 3. Application Layer (New)
-- **MemberQueryService** orchestrates the use case
-
-```kotlin
-// application/member/MemberQueryService.kt
-@Service
-@Transactional(readOnly = true)
-class MemberQueryService(
-    private val memberRepository: MemberRepository
-) {
-    fun getMemberById(id: Long): Member {
-        return memberRepository.findById(id)
-            ?: throw MemberNotFoundException(id)
-    }
-}
-```
-
-**Key Principles**:
-- Thin service: delegates to repository, throws domain exception
-- `@Transactional(readOnly = true)` for read optimization
-- Returns domain entity (Member), not DTO
-- Reusable across different interfaces (REST, GraphQL, CLI)
-
-#### 4. Interface Layer (New)
-- **MemberResponse** DTO for API contract
-- **MemberController** handles HTTP concerns
-- **Mapper** transforms domain entity to DTO
-
-```kotlin
-// interfaces/dto/member/MemberResponse.kt
-data class MemberResponse(
-    val id: Long,
-    val name: String,
-    val email: String,              // from Email.value
-    val phoneNumber: String,        // from PhoneNumber.masked (privacy!)
-    val status: String,             // "ACTIVE" or "WITHDRAWN"
-    val pointBalance: Int,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
-)
-
-// Extension function for mapping
-fun Member.toResponse(): MemberResponse = MemberResponse(
-    id = this.id!!,
-    name = this.name,
-    email = this.email.value,
-    phoneNumber = this.phoneNumber.masked,  // Privacy via Value Object!
-    status = if (isWithdrawn()) "WITHDRAWN" else "ACTIVE",
-    pointBalance = 0,
-    createdAt = this.registeredAt,
-    updatedAt = this.registeredAt
-)
-```
-
-```kotlin
-// interfaces/rest/member/MemberController.kt
-@RestController
-@RequestMapping("/api/members")
-class MemberController(
-    private val memberQueryService: MemberQueryService
-) {
-    @GetMapping("/{id}")
-    fun getMember(@PathVariable id: Long): MemberResponse {
-        val member = memberQueryService.getMemberById(id)
-        return member.toResponse()
-    }
-
-    @ExceptionHandler(MemberNotFoundException::class)
-    fun handleNotFound(ex: MemberNotFoundException): ResponseEntity<ErrorResponse> {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(ErrorResponse(message = ex.message))
-    }
-}
-```
-
-**Key Principles**:
-- Controller is thin: calls service, maps to DTO, handles exceptions
-- DTO uses Value Object properties (email.value, phoneNumber.masked)
-- Domain exception → HTTP status translation happens here
-- Privacy enforced via PhoneNumber.masked (e.g., "010-****-5678")
-
-### Dependency Flow
-
-```
-Controller (interfaces)
-    ↓ depends on
-Application Service (application)
-    ↓ depends on
-Repository Interface (domain) ← DEFINED HERE
-    ↑ implemented by
-Repository Impl (infrastructure)
-```
-
-**Key Insight**: Domain layer is at the center. All dependencies point inward.
-
-### Data Flow
-
-```
-HTTP Request
-    ↓
-Controller: Parse ID, call service
-    ↓
-Service: Call repository, throw if not found
-    ↓
-Repository Impl: Delegate to JPA, convert Optional
-    ↓
-JPA: Query database
-    ↓
-Database: Return row
-    ↑
-JPA: Map to Member entity
-    ↑
-Repository Impl: Return Member or null
-    ↑
-Service: Return Member or throw MemberNotFoundException
-    ↑
-Controller: Catch exception → 404 OR map to MemberResponse
-    ↑
-HTTP Response: JSON with masked phone number
-```
-
-### Privacy Pattern
-
-**Problem**: Phone numbers are sensitive and should be partially masked in API responses.
-
-**Solution**: Use PhoneNumber Value Object's `masked` property.
-
-```kotlin
-// Domain model defines the capability
-@Embeddable
-class PhoneNumber(value: String) {
-    val value: String = normalize(value)
-    val formatted: String = format(value)  // "010-1234-5678"
-    val masked: String = mask(value)       // "010-****-5678"
-}
-
-// DTO leverages it
-fun Member.toResponse() = MemberResponse(
-    phoneNumber = this.phoneNumber.masked  // Privacy enforced here
-)
-```
-
-**Key Insight**: Privacy logic lives in the Value Object, not scattered across DTOs or services.
-
-### Exception Handling Pattern
-
-**Problem**: How to handle "not found" scenario while maintaining layering?
-
-**Solution**: Domain exception + controller translation.
-
-```kotlin
-// Domain layer: business language
-throw MemberNotFoundException(memberId)
-
-// Interface layer: HTTP translation
-@ExceptionHandler(MemberNotFoundException::class)
-fun handleNotFound(ex: MemberNotFoundException): ResponseEntity<ErrorResponse> {
-    return ResponseEntity.status(404).body(ErrorResponse(message = ex.message))
-}
-```
-
-**Key Insight**: Domain doesn't know about HTTP. Controller translates domain concepts to HTTP.
+- Repository layer (interfaces and implementations)
+- Application services (use cases)
+- REST API controllers
 
 ## Value Object Pattern
 
@@ -354,11 +173,11 @@ Detailed functional specifications are available in:
 ## Testing Guidelines
 
 When writing tests:
-- Use Kotest framework for all tests
-- Follow BDD style (Given-When-Then)
-- Test domain logic independently of infrastructure
-- Use test fixtures for complex object creation
-- Mock external dependencies appropriately
+- Use JUnit 5 framework for all tests.
+- Use `@DisplayName` to describe the test's purpose.
+- Test domain logic independently of infrastructure.
+- Use test fixtures for complex object creation.
+- Mock external dependencies appropriately.
 
 ## Code Style Preferences
 
@@ -367,171 +186,6 @@ When writing tests:
 - Leverage Kotlin's null safety features
 - Use extension functions where appropriate
 - Keep functions small and focused on single responsibility
-
-## Service Naming Strategy (Updated 2025-10-05)
-
-이 프로젝트는 **UseCase와 Domain Service를 명확히 구분**하는 네이밍 전략을 사용합니다.
-
-### UseCase: 단일 Aggregate 처리
-
-**위치**: `application/{context}/`
-**네이밍**: `{Action}{Aggregate}UseCase.kt`
-**역할**: 하나의 Aggregate를 중심으로 한 유스케이스 처리
-
-```kotlin
-// application/member/JoinMemberUseCase.kt
-@Service
-@Transactional
-class JoinMemberUseCase(
-    private val memberRepository: MemberRepository,
-    private val emailService: EmailService
-) {
-    fun execute(command: JoinMemberCommand): Member {
-        // 1. Member Aggregate 생성 (도메인 로직)
-        val member = Member(
-            email = Email(command.email),
-            name = command.name,
-            phoneNumber = PhoneNumber(command.phoneNumber)
-        )
-
-        // 2. 저장
-        memberRepository.save(member)
-
-        // 3. 이메일 발송 (인프라)
-        emailService.sendWelcomeEmail(member)
-
-        return member
-    }
-}
-```
-
-**예시**:
-- `JoinMemberUseCase` - 회원 가입
-- `UpdateMemberUseCase` - 회원 정보 수정
-- `CreateReservationUseCase` - 예매 생성
-- `CancelReservationUseCase` - 예매 취소
-
-### Domain Service: 여러 Aggregate 처리
-
-**위치**: `domain/{context}/service/`
-**네이밍**: `{Aggregate}DomainService.kt`
-**역할**: 여러 Aggregate를 걸치는 도메인 로직
-
-```kotlin
-// domain/member/service/MemberDomainService.kt
-class MemberDomainService(
-    private val memberRepository: MemberRepository,
-    private val reservationRepository: ReservationRepository
-) {
-    /**
-     * 회원 탈퇴 가능 여부 검증
-     * Member와 Reservation 두 Aggregate 사용
-     */
-    fun canWithdraw(member: Member): Boolean {
-        val activeReservations = reservationRepository
-            .findActiveByMemberId(member.id!!)
-        return activeReservations.isEmpty()
-    }
-
-    /**
-     * 이메일 중복 검증
-     * 단일 Aggregate지만 Repository 조회가 필요한 도메인 규칙
-     */
-    fun validateUniqueEmail(email: Email) {
-        if (memberRepository.existsByEmail(email)) {
-            throw DuplicateEmailException(email)
-        }
-    }
-}
-```
-
-**예시**:
-- `MemberDomainService` - 회원 관련 도메인 로직
-- `ReservationDomainService` - 예매 관련 도메인 로직
-- `SeatAllocationService` - 좌석 배정 로직
-
-### Query Service: 조회 전용 (CQRS)
-
-**위치**: `application/{context}/`
-**네이밍**: `{Aggregate}QueryService.kt`
-**역할**: 읽기 전용 조회
-
-```kotlin
-// application/member/MemberQueryService.kt
-@Service
-@Transactional(readOnly = true)
-class MemberQueryService(
-    private val memberRepository: MemberRepository
-) {
-    fun getMemberById(id: Long): Member {
-        return memberRepository.findById(id)
-            ?: throw MemberNotFoundException(id)
-    }
-}
-```
-
-**예시**:
-- `MemberQueryService` - 회원 조회
-- `ReservationQueryService` - 예매 조회
-- `PerformanceQueryService` - 공연 조회
-
-### UseCase에서 Domain Service 사용
-
-```kotlin
-// application/member/WithdrawMemberUseCase.kt
-@Service
-@Transactional
-class WithdrawMemberUseCase(
-    private val memberRepository: MemberRepository,
-    private val memberDomainService: MemberDomainService  // Domain Service 주입
-) {
-    fun execute(memberId: Long) {
-        val member = memberRepository.findById(memberId)
-            ?: throw MemberNotFoundException(memberId)
-
-        // Domain Service로 검증 위임 (여러 Aggregate 검증)
-        if (!memberDomainService.canWithdraw(member)) {
-            throw CannotWithdrawException("진행중인 예매가 있습니다")
-        }
-
-        // Member Aggregate의 도메인 로직
-        member.withdraw()
-        memberRepository.save(member)
-    }
-}
-```
-
-### 전체 구조 예시
-
-```
-src/main/kotlin/com/innovation/dddexample/
-├── domain/
-│   └── member/
-│       ├── model/
-│       │   └── Member.kt              # Aggregate Root
-│       ├── repository/
-│       │   └── MemberRepository.kt    # Repository 인터페이스
-│       └── service/
-│           └── MemberDomainService.kt # Domain Service (여러 Aggregate)
-│
-├── application/
-│   └── member/
-│       ├── MemberQueryService.kt      # Query (조회)
-│       ├── JoinMemberUseCase.kt       # UseCase (가입)
-│       ├── UpdateMemberUseCase.kt     # UseCase (수정)
-│       └── WithdrawMemberUseCase.kt   # UseCase (탈퇴, Domain Service 사용)
-│
-└── interfaces/rest/member/
-    └── MemberController.kt            # REST Controller
-```
-
-### 네이밍 결정 기준
-
-| 상황 | 선택 | 예시 |
-|------|------|------|
-| 단일 Aggregate만 사용 | `~UseCase` | `JoinMemberUseCase` |
-| 여러 Aggregate 걸침 | `~DomainService` | `MemberDomainService` |
-| 조회만 (CQRS Query) | `~QueryService` | `MemberQueryService` |
 
 ## Agent Workflow Addendum (2025-10-05)
 
