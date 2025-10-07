@@ -356,7 +356,7 @@ class MemberIntegrationTest {
             val result = memberRepository.findById(member.id!!)
             assertThat(result?.isWithdrawn()).isTrue
             assertThat(result?.isActive()).isFalse
-            assertThat(result?.withdrawnAt).isNotNull
+            assertThat(result?.deletedAt).isNotNull
         }
 
         @Test

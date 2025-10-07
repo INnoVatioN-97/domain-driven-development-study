@@ -52,6 +52,6 @@ fun Member.toResponse(): MemberResponse = MemberResponse(
     phoneNumber = this.phoneNumber.toMasked(),  // [중요] Privacy! 전체 번호가 아닌 마스킹된 형식
     status = if (this.isWithdrawn()) "WITHDRAWN" else "ACTIVE",
     pointBalance = 0,  // TODO: Points Aggregate 연동 필요
-    createdAt = this.registeredAt,
-    updatedAt = this.registeredAt  // TODO: updatedAt 필드 추가 필요
+    createdAt = this.createdAt,
+    updatedAt = this.createdAt  // TODO: updatedAt 필드 추가 필요
 )

@@ -22,8 +22,8 @@ class MemberResponseTest {
             email = Email("test@example.com"),
             name = "홍길동",
             phoneNumber = PhoneNumber("01012345678"),
-            registeredAt = LocalDateTime.of(2025, 1, 15, 10, 30),
-            withdrawnAt = null,
+            createdAt = LocalDateTime.of(2025, 1, 15, 10, 30),
+            deletedAt = null,
             password = "hashedPassword123"
         )
 
@@ -50,8 +50,8 @@ class MemberResponseTest {
             email = Email("withdrawn@example.com"),
             name = "탈퇴회원",
             phoneNumber = PhoneNumber("01098765432"),
-            registeredAt = LocalDateTime.of(2024, 1, 1, 10, 0),
-            withdrawnAt = withdrawnTime,
+            createdAt = LocalDateTime.of(2024, 1, 1, 10, 0),
+            deletedAt = withdrawnTime,
             password = "hashedPassword123"
         )
 
