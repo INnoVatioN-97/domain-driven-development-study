@@ -104,7 +104,7 @@ class Member(
      * DDD: "회원이 언제 우리 시스템에 가입했는가"라는 도메인 이벤트를 기록
      */
     @Column(nullable = false, updatable = false)
-    val registeredAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 
     /**
      * [DDD: Soft Delete 패턴]
@@ -113,7 +113,7 @@ class Member(
      * - 이력 관리 및 복구 가능성 확보
      */
     @Column(nullable = true)
-    var withdrawnAt: LocalDateTime? = null
+    var deletedAt: LocalDateTime? = null
 ) {
 
     /**
@@ -185,9 +185,9 @@ class Member(
     fun withdraw() {
         // [DDD: 비즈니스 불변성 보호]
         // 이미 탈퇴한 회원은 재탈퇴 불가
-        require(withdrawnAt == null) { "이미 탈퇴한 회원입니다" }
+        require(deletedAt == null) { "이미 탈퇴한 회원입니다" }
 
-        this.withdrawnAt = LocalDateTime.now()
+        this.deletedAt = LocalDateTime.now()
 
         // [DDD: 도메인 이벤트 발행 가능]
         // 실전에서는 여기서 MemberWithdrawnEvent 같은 도메인 이벤트를 발행하여
@@ -203,7 +203,7 @@ class Member(
      * DDD: if (member.isWithdrawn()) { ... }
      *      - 도메인 언어로 표현하여 가독성 향상
      */
-    fun isWithdrawn(): Boolean = withdrawnAt != null
+    fun isWithdrawn(): Boolean = deletedAt != null
 
     fun isActive(): Boolean = !isWithdrawn()
 
