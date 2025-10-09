@@ -69,6 +69,7 @@ class SecurityConfig(
                     // 인증 없이 접근 가능한 경로
                     .requestMatchers(
                         "/auth/**",        // 로그인, 회원가입 등
+                        "/games/**",        // 로그인, 회원가입 등
                         "/public/**",      // 공개 API
                         "/actuator/health"     // Health check
                     ).permitAll()

@@ -1,0 +1,26 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innovation.dddexample.infrastructure.mybatis.game.GameMapper">
+
+    <select id="findByDateRange" parameterType="string"
+            resultType="com.innovation.dddexample.interfaces.dto.game.ListWeeklyGamesResponse">
+
+        <![CDATA[
+        SELECT DATE_FORMAT(games.game_time, '%Y.%m.%d %H:%i')              AS game_time,
+               homeTeam.stadium,
+               homeTeam.title                                           AS homeTeam,
+               awayTeam.title                                           AS awayTeam,
+               false                                                    AS is_reserved,
+               CASE
+                   WHEN games.game_time <= NOW() THEN 'CLOSED'
+
+                   WHEN games.game_time >= NOW() THEN 'NOT_STARTED' END AS game_status
+
+        FROM games
+                 INNER JOIN teams AS homeTeam ON games.home_team_id = homeTeam.id
+                 INNER JOIN teams AS awayTeam ON games.away_team_id = awayTeam.id
+        WHERE TRUE
+          AND DATE(games.game_time) BETWEEN #{startDate} AND #{endDate}
+        ORDER BY games.game_time ASC
+        ]]>
+    </select>
+</mapper>
