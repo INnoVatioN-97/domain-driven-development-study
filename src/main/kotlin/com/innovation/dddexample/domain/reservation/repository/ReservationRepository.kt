@@ -8,5 +8,7 @@ import com.innovation.dddexample.domain.reservation.model.Reservation
 interface ReservationRepository {
     fun findById(id: Long): Reservation?
 
+    fun findByGameIdList(gameIdList:List<Long>): List<Reservation>
+
     fun save(reservation: Reservation): Reservation
 }
