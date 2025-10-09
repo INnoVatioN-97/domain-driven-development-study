@@ -3,8 +3,8 @@ package com.innovation.dddexample.infrastructure.persistence.game
 import com.innovation.dddexample.domain.game.model.Game
 import com.innovation.dddexample.domain.game.repository.GameRepository
 import com.innovation.dddexample.infrastructure.mybatis.game.GameMapper
-import com.innovation.dddexample.interfaces.dto.game.ListWeeklyGamesResponse
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 @Repository
 class GameRepositoryImpl(private val gameJpaRepository: GameJpaRepository, private val gameMybatisMapper: GameMapper) :
@@ -27,12 +27,9 @@ class GameRepositoryImpl(private val gameJpaRepository: GameJpaRepository, priva
     }
 
     override fun findByDateRange(
-        startDate: String,
-        endDate: String
-    ): List<ListWeeklyGamesResponse> {
-        return gameMybatisMapper.findByDateRange(
-            startDate, endDate
-        )
+        startDate: LocalDateTime, endDate: LocalDateTime
+    ): List<Game> {
+        return gameJpaRepository.findByDateRange(startDate, endDate)
     }
 
     override fun deleteById(id: Long) {
