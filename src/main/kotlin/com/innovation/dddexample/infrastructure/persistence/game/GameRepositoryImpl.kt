@@ -3,6 +3,7 @@ package com.innovation.dddexample.infrastructure.persistence.game
 import com.innovation.dddexample.domain.game.model.Game
 import com.innovation.dddexample.domain.game.repository.GameRepository
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 @Repository
 class GameRepositoryImpl(private val gameJpaRepository: GameJpaRepository) : GameRepository {
@@ -21,6 +22,15 @@ class GameRepositoryImpl(private val gameJpaRepository: GameJpaRepository) : Gam
 
     override fun findAll(): List<Game> {
         return gameJpaRepository.findAll()
+    }
+
+    override fun findByDateRange(
+        weekStartDate: LocalDateTime,
+        weekEndDate: LocalDateTime
+    ): List<Game> {
+        return gameJpaRepository.findByGameTimeIsGreaterThanEqualAndGameTimeIsLessThanEqual(
+            weekStartDate, weekEndDate
+        )
     }
 
     override fun deleteById(id: Long) {
