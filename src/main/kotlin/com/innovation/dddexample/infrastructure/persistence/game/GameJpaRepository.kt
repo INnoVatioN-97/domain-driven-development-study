@@ -7,6 +7,6 @@ import java.time.LocalDateTime
 
 interface GameJpaRepository : JpaRepository<Game, Long> {
 
-    @Query("SELECT g FROM Game g WHERE g.gameTime BETWEEN ?1 AND ?2")
+    @Query("SELECT g FROM Game g JOIN FETCH g.homeTeam JOIN FETCH g.awayTeam WHERE g.gameTime BETWEEN :startDate AND :endDate ORDER BY g.gameTime ASC")
     fun findByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): List<Game>
 }

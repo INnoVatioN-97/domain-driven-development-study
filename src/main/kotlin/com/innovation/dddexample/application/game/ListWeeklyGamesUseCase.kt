@@ -2,10 +2,7 @@ package com.innovation.dddexample.application.game
 
 import com.innovation.dddexample.application.common.UseCase
 import com.innovation.dddexample.domain.game.repository.GameRepository
-import com.innovation.dddexample.domain.member.repository.MemberRepository
-import com.innovation.dddexample.domain.reservation.model.Reservation
 import com.innovation.dddexample.domain.reservation.repository.ReservationRepository
-import com.innovation.dddexample.domain.team.repository.TeamRepository
 import com.innovation.dddexample.infrastructure.security.SecurityPrincipalResolver
 import com.innovation.dddexample.interfaces.dto.game.ListWeeklyGamesResponse
 import org.springframework.stereotype.Service
@@ -23,44 +20,40 @@ import java.time.format.DateTimeFormatter
 class ListWeeklyGamesUseCase(
     private val gameRepository: GameRepository,
     private val reservationRepository: ReservationRepository,
-    private val memberRepository: MemberRepository,
-    private val teamRepository: TeamRepository,
     private val securityPrincipalResolver: SecurityPrincipalResolver
 ) : UseCase<ListWeeklyGamesCommand, List<ListWeeklyGamesResponse>> {
     override fun execute(command: ListWeeklyGamesCommand): List<ListWeeklyGamesResponse> {
 
         val weekStartDate =
-            LocalDate.parse(command.date, DateTimeFormatter.ISO_DATE).with(DayOfWeek.MONDAY).atTime(0, 0)
+            LocalDate.parse(command.date, DateTimeFormatter.ISO_DATE).with(DayOfWeek.MONDAY).atStartOfDay()
         val weekEndDate =
-            LocalDate.parse(command.date, DateTimeFormatter.ISO_DATE).with(DayOfWeek.SUNDAY).atTime(23, 59)
+            LocalDate.parse(command.date, DateTimeFormatter.ISO_DATE).with(DayOfWeek.SUNDAY).atTime(23, 59, 59)
 
-        // 주간 일정 전체 가져오기
+        // 1. Game과 Team 정보를 한 번의 쿼리로 가져옵니다. (최적화 완료)
         val games = gameRepository.findByDateRange(weekStartDate, weekEndDate)
-        val teams = teamRepository.findAll()
+        if (games.isEmpty()) return emptyList()
 
-        val memberId = securityPrincipalResolver.getMemberIdOrNull();
-
-        var reservations = emptyList<Reservation>()
-        val result = mutableListOf<ListWeeklyGamesResponse>()
-        if (memberId != null) {
-            reservations = reservationRepository.findByGameIdList(games.map { it.id!! })
+        // 2. 인증된 사용자의 예매 정보만 한 번의 쿼리로 가져옵니다. (최적화 완료)
+        val memberId = securityPrincipalResolver.getMemberIdOrNull()
+        val reservedGameIds: Set<Long> = if (memberId != null) {
+            val gameIds = games.mapNotNull { it.id }
+            reservationRepository.findByMemberIdAndGameIds(memberId, gameIds)
+                .map { it.gameId }
+                .toSet()
+        } else {
+            emptySet()
         }
 
-        games.forEach { game ->
-            run {
-                result.add(
-                    ListWeeklyGamesResponse(
-                        gameTime = game.gameTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")),
-                        stadium = teams.find { team -> team.id!! == game.homeTeam.id }!!.stadium,
-                        homeTeam = game.homeTeam.title,
-                        awayTeam = game.awayTeam.title,
-                        isReserved = reservations.any { reservation -> reservation.gameId == game.id },
-                        gameStatus = "NOT_STARTED"
-                    )
-                )
-            }
+        // 3. UseCase가 DTO 변환을 책임집니다.
+        return games.map { game ->
+            ListWeeklyGamesResponse(
+                gameTime = game.gameTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")),
+                stadium = game.homeTeam.stadium, // fetch join으로 가져왔으므로 바로 접근 가능
+                homeTeam = game.homeTeam.title,
+                awayTeam = game.awayTeam.title,
+                isReserved = reservedGameIds.contains(game.id),
+                gameStatus = if (game.gameTime.isBefore(java.time.LocalDateTime.now())) "CLOSED" else "NOT_STARTED"
+            )
         }
-
-        return result
     }
 }

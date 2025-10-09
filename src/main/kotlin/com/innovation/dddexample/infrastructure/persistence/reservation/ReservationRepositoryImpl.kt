@@ -11,11 +11,14 @@ class ReservationRepositoryImpl(private val reservationJpaRepository: Reservatio
         return reservationJpaRepository.findById(id).orElse(null)
     }
 
-    override fun findByGameIdList(gameIdList: List<Long>): List<Reservation> {
-        return reservationJpaRepository.findByGameIdIn(gameIdList.toMutableList())
-    }
-
     override fun save(reservation: Reservation): Reservation {
         return reservationJpaRepository.save(reservation)
+    }
+
+    override fun findByMemberIdAndGameIds(memberId: Long, gameIds: List<Long>): List<Reservation> {
+        if (gameIds.isEmpty()) {
+            return emptyList()
+        }
+        return reservationJpaRepository.findByMemberIdAndGameIdIn(memberId, gameIds)
     }
 }
