@@ -4,7 +4,6 @@ import com.innovation.dddexample.application.common.UseCase
 import com.innovation.dddexample.domain.game.repository.GameRepository
 import com.innovation.dddexample.domain.member.repository.MemberRepository
 import com.innovation.dddexample.domain.team.repository.TeamRepository
-import com.innovation.dddexample.infrastructure.mybatis.game.GameMapper
 import com.innovation.dddexample.interfaces.dto.game.ListWeeklyGamesResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,7 +18,6 @@ import java.time.format.DateTimeFormatter
 @Service
 @Transactional(readOnly = true)
 class ListWeeklyGamesUseCase(
-    private val gameMapper: GameMapper,
     private val gameRepository: GameRepository,
     private val memberRepository: MemberRepository,
     private val teamRepository: TeamRepository
@@ -32,7 +30,7 @@ class ListWeeklyGamesUseCase(
             LocalDate.parse(command.date, DateTimeFormatter.ISO_DATE).with(DayOfWeek.SUNDAY)
                 .format(DateTimeFormatter.ISO_DATE)
 
-        val games = gameMapper.findByDateRange(weekStartDate, weekEndDate)
+        val games = gameRepository.findByDateRange(weekStartDate, weekEndDate)
 
         return games
     }

@@ -2,11 +2,13 @@ package com.innovation.dddexample.infrastructure.persistence.game
 
 import com.innovation.dddexample.domain.game.model.Game
 import com.innovation.dddexample.domain.game.repository.GameRepository
+import com.innovation.dddexample.infrastructure.mybatis.game.GameMapper
+import com.innovation.dddexample.interfaces.dto.game.ListWeeklyGamesResponse
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 
 @Repository
-class GameRepositoryImpl(private val gameJpaRepository: GameJpaRepository) : GameRepository {
+class GameRepositoryImpl(private val gameJpaRepository: GameJpaRepository, private val gameMybatisMapper: GameMapper) :
+    GameRepository {
 
     override fun save(game: Game): Game {
         return gameJpaRepository.save(game)
@@ -25,11 +27,11 @@ class GameRepositoryImpl(private val gameJpaRepository: GameJpaRepository) : Gam
     }
 
     override fun findByDateRange(
-        weekStartDate: LocalDateTime,
-        weekEndDate: LocalDateTime
-    ): List<Game> {
-        return gameJpaRepository.findByGameTimeIsGreaterThanEqualAndGameTimeIsLessThanEqual(
-            weekStartDate, weekEndDate
+        startDate: String,
+        endDate: String
+    ): List<ListWeeklyGamesResponse> {
+        return gameMybatisMapper.findByDateRange(
+            startDate, endDate
         )
     }
 
