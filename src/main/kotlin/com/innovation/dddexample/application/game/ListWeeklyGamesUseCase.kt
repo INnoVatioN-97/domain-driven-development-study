@@ -49,8 +49,8 @@ class ListWeeklyGamesUseCase(
             ListWeeklyGamesResponse(
                 gameTime = game.gameTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")),
                 stadium = game.homeTeam.stadium, // fetch join으로 가져왔으므로 바로 접근 가능
-                homeTeam = game.homeTeam.title,
-                awayTeam = game.awayTeam.title,
+                homeTeam = game.homeTeam.name,
+                awayTeam = game.awayTeam.name,
                 isReserved = reservedGameIds.contains(game.id),
                 gameStatus = if (game.gameTime.isBefore(java.time.LocalDateTime.now())) "CLOSED" else "NOT_STARTED"
             )

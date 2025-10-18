@@ -1,7 +1,7 @@
-package com.innovation.dddexample.infrastructure.persistence.team
+package com.innovation.dddexample.infrastructure.persistence.game
 
-import com.innovation.dddexample.domain.team.model.Team
-import com.innovation.dddexample.domain.team.repository.TeamRepository
+import com.innovation.dddexample.domain.game.model.Team
+import com.innovation.dddexample.domain.game.repository.TeamRepository
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -10,8 +10,8 @@ class TeamRepositoryImpl(private val teamJpaRepository: TeamJpaRepository) : Tea
         return teamJpaRepository.save(team)
     }
 
-    override fun saveAll(team: List<Team>): List<Team> {
-        return teamJpaRepository.saveAll(team)
+    override fun saveAll(teams: List<Team>): List<Team> {
+        return teamJpaRepository.saveAll(teams)
     }
 
     override fun findById(id: Long): Team? {

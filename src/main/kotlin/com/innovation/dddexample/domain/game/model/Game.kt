@@ -1,6 +1,6 @@
 package com.innovation.dddexample.domain.game.model
 
-import com.innovation.dddexample.domain.team.model.Team
+import com.innovation.dddexample.domain.game.model.Team
 import jakarta.persistence.*
 import java.time.LocalDateTime
 

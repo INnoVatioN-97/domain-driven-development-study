@@ -1,12 +1,11 @@
-package com.innovation.dddexample.domain.team.model
+package com.innovation.dddexample.domain.game.model
 
-import com.innovation.dddexample.domain.game.model.Game
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import java.time.LocalDateTime
 
 /**
- * 경기 엔티티
+ * 팀 엔티티
  */
 @Entity
 @Table(name = "teams")
@@ -15,8 +14,8 @@ class Team(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(nullable = false, length = 45)
-    val title: String,
+    @Column(name = "name", nullable = false, length = 45)
+    val name: String,
 
     @Column(nullable = false, length = 256)
     val logoUrl: String,

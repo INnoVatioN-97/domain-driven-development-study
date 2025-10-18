@@ -2,8 +2,8 @@ package com.innovation.dddexample.infrastructure.seed.game
 
 import com.innovation.dddexample.domain.game.model.Game
 import com.innovation.dddexample.domain.game.repository.GameRepository
-import com.innovation.dddexample.domain.team.model.Team
-import com.innovation.dddexample.domain.team.repository.TeamRepository
+import com.innovation.dddexample.domain.game.model.Team
+import com.innovation.dddexample.domain.game.repository.TeamRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
