@@ -162,10 +162,6 @@ class AuthControllerIntegrationTest {
             }
         }
 
-        // NOTE: Value Object 검증 실패 테스트는 현재 GlobalExceptionHandler 구현에 따라 달라질 수 있어 주석 처리
-        // 추후 IllegalArgumentException을 400으로 변환하는 핸들러 추가 시 활성화 필요
-
-        /*
         @Test
         @DisplayName("잘못된 이메일 형식 - 400 Bad Request 반환")
         fun `should return 400 when email format is invalid`() {
@@ -219,7 +215,6 @@ class AuthControllerIntegrationTest {
                 status { isBadRequest() }
             }
         }
-        */
 
         @Test
         @DisplayName("비밀번호 암호화 검증 - 평문 비밀번호가 아닌 해시값으로 저장")
@@ -348,12 +343,8 @@ class AuthControllerIntegrationTest {
             }
         }
 
-        // NOTE: 탈퇴한 회원 로그인 처리는 현재 SignInMemberUseCase 구현에 따라 달라질 수 있어 주석 처리
-        // 추후 탈퇴 회원 체크 로직 추가 시 활성화 필요
-
-        /*
         @Test
-        @DisplayName("탈퇴한 회원의 로그인 시도 - 적절한 에러 반환")
+        @DisplayName("탈퇴한 회원의 로그인 시도 - 400 Bad Request 반환")
         fun `should handle withdrawn member login attempt`() {
             val password = "WithdrawTest123!"
             val signUpCommand = SignUpMemberCommand(
@@ -381,10 +372,9 @@ class AuthControllerIntegrationTest {
                 contentType = MediaType.APPLICATION_JSON
                 content = objectMapper.writeValueAsString(signInCommand)
             }.andExpect {
-                status { isForbidden() } // 403 Forbidden
+                status { isBadRequest() } // 400 Bad Request (BusinessRuleViolationException)
             }
         }
-        */
 
         @Test
         @DisplayName("여러 번 로그인 시도 시 각각 다른 토큰 발급")

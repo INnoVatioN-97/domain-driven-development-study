@@ -149,6 +149,35 @@ class GlobalExceptionHandler {
     }
 
     /**
+     * IllegalArgumentException (Value Object 검증 실패 등) → HTTP 400 Bad Request
+     *
+     * [처리 대상]
+     * - Value Object 생성 시 검증 실패 (Email, PhoneNumber 등)
+     * - Domain 로직에서 발생하는 IllegalArgumentException
+     *
+     * [사용 케이스]
+     * - Email("invalid-format") → "올바른 이메일 형식이 아닙니다"
+     * - PhoneNumber("123") → "올바른 전화번호 형식이 아닙니다"
+     * - Member.updateProfile(name = "") → "회원 이름은 필수입니다"
+     *
+     * [주의사항]
+     * - IllegalArgumentException은 너무 범용적이므로 신중하게 사용
+     * - 가능하면 도메인별 예외 클래스 사용 권장
+     */
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgument(ex: IllegalArgumentException): ResponseEntity<ErrorResponse> {
+        logger.warn { "Illegal argument: ${ex.message}" }
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ErrorResponse(
+                    message = ex.message ?: "Invalid request parameter",
+                    status = HttpStatus.BAD_REQUEST.value()
+                )
+            )
+    }
+
+    /**
      * Exception (최종 안전망) → HTTP 500 Internal Server Error
      *
      * [처리 대상]

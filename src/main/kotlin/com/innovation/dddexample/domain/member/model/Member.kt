@@ -116,6 +116,10 @@ class Member(
     var deletedAt: LocalDateTime? = null
 ) {
 
+    init {
+        require(name.isNotBlank()) { "회원 이름은 필수입니다" }
+    }
+
     /**
      * [DDD 핵심: 도메인 로직을 엔티티 내부에 캡슐화]
      *

@@ -3,6 +3,7 @@ package com.innovation.dddexample.application.member
 import com.innovation.dddexample.application.common.UseCase
 import com.innovation.dddexample.domain.member.exception.InvalidPasswordException
 import com.innovation.dddexample.domain.member.exception.MemberNotFoundException
+import com.innovation.dddexample.domain.member.exception.WithdrawnMemberException
 import com.innovation.dddexample.domain.member.model.Email
 import com.innovation.dddexample.infrastructure.security.jwt.JwtTokenProvider
 import com.innovation.dddexample.domain.member.repository.MemberRepository
@@ -23,6 +24,11 @@ class SignInMemberUseCase(
     override fun execute(command: SignInMemberCommand): TokenResponse {
         val member = memberRepository.findByEmail(Email(command.email))
             ?: throw MemberNotFoundException.byEmail(command.email)
+
+        // 탈퇴한 회원 체크
+        if (member.isWithdrawn()) {
+            throw WithdrawnMemberException(command.email)
+        }
 
         if (!passwordEncoder.matches(command.password, member.password)) {
             throw InvalidPasswordException()
