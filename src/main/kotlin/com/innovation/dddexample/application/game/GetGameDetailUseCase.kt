@@ -24,7 +24,6 @@ class GetGameDetailUseCase(
         val seats = seatRepository.findByGameId(command.gameId)
         val seatGrades = seatGradeRepository.findByGameId(command.gameId)
 
-        // TODO: seat, seatGrade로 가능좌석 필터해야.
         val seatSummaryInfoList = mutableListOf<SeatSummaryInfo>()
 
         seatGrades.forEach { seatGrade ->
