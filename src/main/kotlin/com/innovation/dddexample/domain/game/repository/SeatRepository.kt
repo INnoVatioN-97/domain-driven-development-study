@@ -2,8 +2,8 @@ package com.innovation.dddexample.domain.game.repository
 
 import com.innovation.dddexample.domain.game.model.Seat
 
-interface SeatRepository {
-    fun findById(id: Long): Seat?
+interface SeatRepository : SeatRepositoryCustom {
+    fun findById(id: Long): Seat?//
 
     fun findByGameId(gameId: Long): List<Seat>
 

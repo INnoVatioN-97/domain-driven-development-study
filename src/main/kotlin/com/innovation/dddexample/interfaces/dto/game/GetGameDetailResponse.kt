@@ -8,4 +8,4 @@ data class GetGameDetailResponse(
     val seatsSummary: List<SeatSummaryInfo>
 )
 
-data class SeatSummaryInfo(var grade: String, var total: Int, var remaining: Int)
+data class SeatSummaryInfo(var grade: String, var total: Long, var remaining: Long)

@@ -22,6 +22,10 @@ class GameRepositoryImpl(private val gameJpaRepository: GameJpaRepository, priva
         return gameJpaRepository.findById(id).orElse(null)
     }
 
+    override fun findGameDetailsById(id: Long): Game? {
+        return gameJpaRepository.findGameDetailsById(id).orElse(null)
+    }
+
     override fun findAll(): List<Game> {
         return gameJpaRepository.findAll()
     }

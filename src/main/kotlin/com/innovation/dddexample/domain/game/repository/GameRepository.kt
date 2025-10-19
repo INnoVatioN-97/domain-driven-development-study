@@ -7,6 +7,7 @@ interface GameRepository {
     fun save(game: Game): Game
     fun saveAll(games: List<Game>): List<Game>
     fun findById(id: Long): Game?
+    fun findGameDetailsById(id: Long): Game?
     fun findAll(): List<Game>
     fun findByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): List<Game>
     fun deleteById(id: Long)
