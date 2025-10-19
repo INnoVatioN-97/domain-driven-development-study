@@ -9,4 +9,8 @@ class SeatGradeRepositoryImpl(private val seatGradeJpaRepository: SeatGradeJpaRe
     override fun saveAll(seatGrades: List<SeatGrade>): List<SeatGrade> {
         return seatGradeJpaRepository.saveAll(seatGrades)
     }
+
+    override fun findByGameId(gameId: Long): List<SeatGrade> {
+        return seatGradeJpaRepository.findByGameId(gameId)
+    }
 }

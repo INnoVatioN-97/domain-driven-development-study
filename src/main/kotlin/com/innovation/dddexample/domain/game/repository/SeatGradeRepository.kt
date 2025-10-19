@@ -4,4 +4,6 @@ import com.innovation.dddexample.domain.game.model.SeatGrade
 
 interface SeatGradeRepository {
     fun saveAll(seatGrades: List<SeatGrade>): List<SeatGrade>
+
+    fun findByGameId(gameId: Long): List<SeatGrade>
 }
